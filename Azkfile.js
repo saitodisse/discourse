@@ -46,12 +46,16 @@ systems({
       // if you"re setting it in a .env file
       RUBY_ENV: "development",
       BUNDLE_APP_CONFIG: "/azk/bundler",
-      DISCOURSE_SMTP_ADDRESS: "$MAIL_SMTP_HOST",
-      DISCOURSE_SMTP_PORT: "$MAIL_SMTP_PORT"
-
+      DISCOURSE_DEVELOPER_EMAILS: "admin@example.com",
+      DISCOURSE_HOSTNAME: "#{system.name}.#{azk.default_domain}"
     }
   },
 
+  "discourse-sidekiq": {
+    extends: "discourse",
+    wait: undefined,
+    command: "bundle exec sidekiq"
+  },
   /////////////////////////////////////////////////
   /// postgres
   /// ----------------------

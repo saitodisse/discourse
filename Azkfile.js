@@ -51,11 +51,20 @@ systems({
     }
   },
 
+  /////////////////////////////////////////////////
+  /// discourse-sidekiq
+  /// ----------------------
+  /// sidekiq worker
+  /////////////////////////////////////////////////
   "discourse-sidekiq": {
     extends: "discourse",
+    scalable: { default: 1, limit: 1 },
+    http: null,
+    ports: null,
     wait: undefined,
-    command: "bundle exec sidekiq"
+    command: "bundle exec sidekiq -c 3 -v"
   },
+
   /////////////////////////////////////////////////
   /// postgres
   /// ----------------------
@@ -95,13 +104,17 @@ systems({
   /////////////////////////////////////////////////
   redis: {
     image: {"docker": "redis"},
+    ports: {
+      // exports global variables
+      data: "6379/tcp"
+    },
     export_envs: {
       "REDIS_HOST": "#{net.host}",
       "REDIS_PORT": "#{net.port.data}",
-      "REDIS_URL": "redis://#{net.host}:#{net.port[6379]}",
-      "OPENREDIS_URL": "redis://#{net.host}:#{net.port[6379]}",
+      "REDIS_URL": "redis://#{net.host}:#{net.port.data}",
+      "OPENREDIS_URL": "redis://#{net.host}:#{net.port.data}",
       "DISCOURSE_REDIS_HOST": "#{net.host}",
-      "DISCOURSE_REDIS_PORT": "#{net.port[6379]}"
+      "DISCOURSE_REDIS_PORT": "#{net.port.data}"
     }
   },
 
@@ -115,7 +128,7 @@ systems({
     image: {"docker": "schickling/mailcatcher"},
     http: {
       domains: [
-        "#{system.name}.azkdemo.#{azk.default_domain}"
+        "#{system.name}.#{azk.default_domain}"
       ]
     },
     ports: {

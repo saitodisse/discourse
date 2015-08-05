@@ -14,9 +14,7 @@ systems({
   /////////////////////////////////////////////////
   discourse: {
     depends: ["postgres", "redis", "mail"],
-    // More images:  http://images.azk.io
     image: {"docker": "azukiapp/ruby:2.0"},
-    // Steps to execute before running instances
     provision: [
       "bundle install --path /azk/bundler",
       "bundle exec rake db:migrate"
@@ -37,16 +35,23 @@ systems({
       domains: [ "#{system.name}.#{azk.default_domain}" ]
     },
     ports: {
+
       // exports global variables
       http: "3000/tcp"
     },
     envs: {
+
       // Make sure that the PORT value is the same as the one
       // in ports/http below, and that it"s also the same
       // if you"re setting it in a .env file
-      RUBY_ENV: "development",
+      RAILS_ENV: "development",
       BUNDLE_APP_CONFIG: "/azk/bundler",
       DISCOURSE_DEVELOPER_EMAILS: "admin@example.com",
+      DISCOURSE_HOSTNAME: "#{system.name}.#{azk.default_domain}"
+    },
+    export_envs: {
+
+      // will override on "discourse-sidekiq" that extends same envs
       DISCOURSE_HOSTNAME: "#{system.name}.#{azk.default_domain}"
     }
   },
@@ -55,8 +60,12 @@ systems({
   /// discourse-sidekiq
   /// ----------------------
   /// sidekiq worker
+  /// /jobs
   /////////////////////////////////////////////////
   "discourse-sidekiq": {
+
+    // depends on discourse too
+    depends: ["discourse", "postgres", "redis", "mail"],
     extends: "discourse",
     scalable: { default: 1, limit: 1 },
     http: null,
@@ -72,7 +81,6 @@ systems({
   /////////////////////////////////////////////////
   postgres: {
     depends: [],
-    // More images:  http://images.azk.io
     image: {"docker": "azukiapp/postgres:9.3"},
     shell: "/bin/bash",
     wait: 20,
@@ -81,11 +89,9 @@ systems({
       "/var/log/postgresql": path("./log/postgresql")
     },
     ports: {
-      // exports global variables
       data: "5432/tcp"
     },
     envs: {
-      // set instances variables
       POSTGRESQL_USER: "azk",
       POSTGRESQL_PASS: "azk",
       POSTGRESQL_DB: "postgres_development"
@@ -105,7 +111,6 @@ systems({
   redis: {
     image: {"docker": "redis"},
     ports: {
-      // exports global variables
       data: "6379/tcp"
     },
     export_envs: {

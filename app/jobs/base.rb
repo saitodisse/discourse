@@ -123,6 +123,8 @@ module Jobs
         end
 
       exceptions = []
+
+
       dbs.each do |db|
         begin
           thread_exception = {}

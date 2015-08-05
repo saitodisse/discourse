@@ -713,7 +713,7 @@ developer:
       development: false
       default: true
     default:
-      development: 3000
+      development: <%= ENV['DISCOURSE_HOSTNAME'] %>
       default: ''
   queue_jobs:
     hidden:

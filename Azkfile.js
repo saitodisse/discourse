@@ -2,30 +2,37 @@
 /* eslint camelcase: [2, {properties: "never"}] */
 
 /**
- *   Discourse systems:
- *     - discourse: main rails web site
+ *   ### Discourse systems:
+ *
+ *     - discourse: main rails web site (http://discourse.dev.azk.io)
  *     - discourse-sidekiq: run jobs, like send emails
  *     - postgres
  *     - redis
- *     - mail: mailcatcher
+ *     - mail: mailcatcher (http://mail.dev.azk.io)
  *
- *     install azk (see at the end of this file) and run:
+ *   ### Install azk (see at the end of this file) and run:
  *
  *     ```
  *     $ azk start
  *     ```
  *
- *     main site:
- *     - http://discourse.dev.azk.io
- *
- *     check mails send:
- *     - http://mail.dev.azk.io
- *
- *
- *     to stop everything
+ *   ### Other commands
  *
  *     ```
+ *     # stop all containers
  *     $ azk stop
+ *
+ *     # restart all container
+ *     $ azk restart
+ *
+ *     # restart and reprovision all container
+ *     $ azk restart -Rvv
+ *
+ *     # check logs
+ *     $ azk logs
+ *
+ *     # info on containers
+ *     $ azk info
  *     ```
  */
 
@@ -59,22 +66,16 @@ systems({
       domains: [ "#{system.name}.#{azk.default_domain}" ]
     },
     ports: {
-
       // exports global variables
       http: "3000/tcp"
     },
     envs: {
-
-      // Make sure that the PORT value is the same as the one
-      // in ports/http below, and that it"s also the same
-      // if you"re setting it in a .env file
       RAILS_ENV: "development",
       BUNDLE_APP_CONFIG: "/azk/bundler",
       DISCOURSE_DEVELOPER_EMAILS: "admin@example.com",
       DISCOURSE_HOSTNAME: "#{system.name}.#{azk.default_domain}"
     },
     export_envs: {
-
       // will override on "discourse-sidekiq" that extends same envs
       DISCOURSE_HOSTNAME: "#{system.name}.#{azk.default_domain}"
     }
@@ -87,9 +88,7 @@ systems({
   /// /jobs
   /////////////////////////////////////////////////
   "discourse-sidekiq": {
-
-    // depends on discourse too
-    depends: ["discourse", "postgres", "redis", "mail"],
+    depends: ["discourse", "postgres", "redis", "mail"], // depends on discourse too
     extends: "discourse",
     scalable: { default: 1, limit: 1 },
     http: null,
@@ -150,7 +149,7 @@ systems({
   /////////////////////////////////////////////////
   /// mail
   /// ----------------------
-  /// mailcatcher
+  /// mailcatcher: will intercept all mail sent
   /////////////////////////////////////////////////
   mail: {
     depends: [],
@@ -174,7 +173,6 @@ systems({
 });
 
 /**
- *
  *  ---------------------------------
  *  More about azk
  *  ---------------------------------
@@ -190,7 +188,6 @@ systems({
  *  + Images directory created by the azk team
  *      http://images.azk.io
  *
- *
  *  ---------------------------------
  *  Contribute to azk
  *  ---------------------------------
@@ -205,7 +202,6 @@ systems({
  *
  *  + Check out our awesome sponsors
  *      http://azk.io/#sponsors
- *
  *
  *  ---------------------------------
  *  Stay in touch with the azk team
@@ -224,5 +220,4 @@ systems({
  *
  *  + Twitter
  *      http://twitter.com/azukiapp
- *
  */

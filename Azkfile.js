@@ -1,8 +1,32 @@
 /* globals systems path sync persistent */
-/*eslint camelcase: [2, {properties: "never"}]*/
+/* eslint camelcase: [2, {properties: "never"}] */
 
 /**
- * discourse
+ *   Discourse systems:
+ *     - discourse: main rails web site
+ *     - discourse-sidekiq: run jobs, like send emails
+ *     - postgres
+ *     - redis
+ *     - mail: mailcatcher
+ *
+ *     install azk (see at the end of this file) and run:
+ *
+ *     ```
+ *     $ azk start
+ *     ```
+ *
+ *     main site:
+ *     - http://discourse.dev.azk.io
+ *
+ *     check mails send:
+ *     - http://mail.dev.azk.io
+ *
+ *
+ *     to stop everything
+ *
+ *     ```
+ *     $ azk stop
+ *     ```
  */
 
 systems({

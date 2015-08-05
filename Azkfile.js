@@ -2,7 +2,9 @@
 /* eslint camelcase: [2, {properties: "never"}] */
 
 /**
- *   ### Discourse systems:
+ *   -------
+ *   Systems
+ *   -------
  *
  *     - discourse: main rails web site (http://discourse.dev.azk.io)
  *     - discourse-sidekiq: run jobs, like send emails
@@ -10,29 +12,53 @@
  *     - redis
  *     - mail: mailcatcher (http://mail.dev.azk.io)
  *
- *   ### Install azk (see at the end of this file) and run:
+ *     Attention: this is a dev only version
+ *     To test production or several instances in cloud use this instructions:
+ *     https://github.com/discourse/discourse/blob/master/docs/INSTALL-cloud.md
  *
+ *   ---------
+ *   Start azk
+ *   ---------
+ *
+ *     ```sh
+ *       # Install azk (see at the end of this file)
+ *
+ *       # start all systems
+ *       $ azk start
  *     ```
- *     $ azk start
+ *
+ *   ------------------
+ *   Other azk commands
+ *   ------------------
+ *
+ *     ```sh
+ *       # stop all containers
+ *       $ azk stop
+ *
+ *       # restart all container
+ *       $ azk restart
+ *
+ *       # restart and reprovision all container
+ *       $ azk restart -Rvv
+ *
+ *       # check logs
+ *       $ azk logs
+ *
+ *       # info on containers
+ *       $ azk info
  *     ```
  *
- *   ### Other commands
+ *   ------------------------------------------
+ *   Use a real SMTP server instead mailcatcher
+ *   ------------------------------------------
  *
- *     ```
- *     # stop all containers
- *     $ azk stop
+ *     Just create an `.env` file on root folder:
  *
- *     # restart all container
- *     $ azk restart
- *
- *     # restart and reprovision all container
- *     $ azk restart -Rvv
- *
- *     # check logs
- *     $ azk logs
- *
- *     # info on containers
- *     $ azk info
+ *     ```envfile
+ *       DISCOURSE_SMTP_ADDRESS=smtp.mandrillapp.com
+ *       DISCOURSE_SMTP_PORT=587
+ *       DISCOURSE_SMTP_USER_NAME=xxxss@gmail.com
+ *       DISCOURSE_SMTP_PASSWORD=xxxxxxxxxxxxxxxxxxxxxxxxx
  *     ```
  */
 
@@ -77,7 +103,9 @@ systems({
     },
     export_envs: {
       // will override on "discourse-sidekiq" that extends same envs
-      DISCOURSE_HOSTNAME: "#{system.name}.#{azk.default_domain}"
+      DISCOURSE_HOSTNAME: "#{system.name}.#{azk.default_domain}",
+      // will be used on ngrok system
+      APP_URL: "#{azk.default_domain}:#{net.port.http}"
     }
   },
 
@@ -164,9 +192,38 @@ systems({
       smtp: "1025/tcp"
     },
     export_envs: {
-      // exports global variables
-      DISCOURSE_SMTP_ADDRESS: "#{net.host}",
-      DISCOURSE_SMTP_PORT: "#{net.port.smtp}"
+      // exports global variables to discourse's systems
+      DISCOURSE_MAILCATCHER_SMTP_ADDRESS: "#{net.host}",
+      DISCOURSE_MAILCATCHER_SMTP_PORT: "#{net.port.smtp}"
+    }
+  },
+
+  /////////////////////////////////////////////////
+  /// ngrok: discourse website tunnel exposer
+  /// -----------------------------
+  /// Secure tunnels to localhost
+  /// "I want to expose a local server behind a NAT
+  /// or firewall to the internet."
+  ///
+  /// https://ngrok.com/
+  /////////////////////////////////////////////////
+  "ngrok": {
+    depends: ["discourse"],
+    image: {docker: "azukiapp/ngrok"},
+    mounts: {
+      "/ngrok/log": path("/tmp")
+    },
+    scalable: { default: 1 },
+    wait: 10,
+    http: {
+      domains: ["#{system.name}.#{azk.default_domain}"]
+    },
+    ports: {
+      http: "4040/tcp"
+    },
+    envs: {
+      NGROK_CONFIG: "/ngrok/ngrok.yml",
+      NGROK_LOG: "/ngrok/log/#{system.name}_ngrok.log"
     }
   }
 

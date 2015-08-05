@@ -9,8 +9,7 @@
     { "path": "config" },
     { "path": "./",
       "name": "project",
-      "folder_exclude_patterns": ["*"],
-      "file_exclude_patterns": [".*"]
+      "folder_exclude_patterns": ["*"]
     },
     {
       "path": "db",

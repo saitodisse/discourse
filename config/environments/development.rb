@@ -35,8 +35,8 @@ Discourse::Application.configure do
   # config.action_mailer.smtp_settings = { address: "localhost", port: 1025 }
   if GlobalSetting.smtp_address
     settings = {
-      address:              GlobalSetting.smtp_address || "localhost",
-      port:                 GlobalSetting.smtp_port    || 1025,
+      address:              GlobalSetting.smtp_address || GlobalSetting.mailcatcher_smtp_address || "localhost",
+      port:                 GlobalSetting.smtp_port    || GlobalSetting.mailcatcher_smtp_port    || 1025,
       domain:               GlobalSetting.smtp_domain,
       user_name:            GlobalSetting.smtp_user_name,
       password:             GlobalSetting.smtp_password,

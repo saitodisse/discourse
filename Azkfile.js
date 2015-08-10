@@ -1,65 +1,9 @@
 /* globals systems path sync persistent */
 /* eslint camelcase: [2, {properties: "never"}] */
+/* eslint comma-dangle: [0, {properties: "never"}] */
 
 /**
- *   -------
- *   Systems
- *   -------
- *
- *     - discourse: main rails web site (http://discourse.dev.azk.io)
- *     - discourse-sidekiq: run jobs, like send emails
- *     - postgres
- *     - redis
- *     - mail: mailcatcher (http://mail.dev.azk.io)
- *
- *     Attention: this is a dev only version
- *     To test production or several instances in cloud use this instructions:
- *     https://github.com/discourse/discourse/blob/master/docs/INSTALL-cloud.md
- *
- *   ---------
- *   Start azk
- *   ---------
- *
- *     ```sh
- *       # Install azk (see at the end of this file)
- *
- *       # start all systems
- *       $ azk start
- *     ```
- *
- *   ------------------
- *   Other azk commands
- *   ------------------
- *
- *     ```sh
- *       # stop all containers
- *       $ azk stop
- *
- *       # restart all container
- *       $ azk restart
- *
- *       # restart and reprovision all container
- *       $ azk restart -Rvv
- *
- *       # check logs
- *       $ azk logs
- *
- *       # info on containers
- *       $ azk info
- *     ```
- *
- *   ------------------------------------------
- *   Use a real SMTP server instead mailcatcher
- *   ------------------------------------------
- *
- *     Just create an `.env` file on root folder:
- *
- *     ```envfile
- *       DISCOURSE_SMTP_ADDRESS=smtp.mandrillapp.com
- *       DISCOURSE_SMTP_PORT=587
- *       DISCOURSE_SMTP_USER_NAME=xxxss@gmail.com
- *       DISCOURSE_SMTP_PASSWORD=xxxxxxxxxxxxxxxxxxxxxxxxx
- *     ```
+ *   see more info on Azkfile.md
  */
 
 systems({
@@ -213,7 +157,7 @@ systems({
     mounts: {
       "/ngrok/log": path("/tmp")
     },
-    scalable: { default: 1 },
+    scalable: { default: 0, "limit": 1 },
     wait: 10,
     http: {
       domains: ["#{system.name}.#{azk.default_domain}"]
@@ -225,56 +169,21 @@ systems({
       NGROK_CONFIG: "/ngrok/ngrok.yml",
       NGROK_LOG: "/ngrok/log/#{system.name}_ngrok.log"
     }
-  }
+  },
+
+  deploy: {
+    image: {"docker": "azukiapp/deploy-digitalocean"},
+    mounts: {
+      "/azk/deploy/src":  path("."),
+      "/azk/deploy/.ssh": path("#{process.env.HOME}/.ssh")
+    },
+    scalable: {"default": 0, "limit": 0},
+    envs: {
+      //RUN_DEPLOY: 'false',
+      //RUN_SETUP: 'false',
+      AZK_RESTART_COMMAND: 'azk restart -R',
+      AZK_CHECKOUT_COMMIT_BRANCH_TAG: 'feature/azkfile',
+    }
+  },
 
 });
-
-/**
- *  ---------------------------------
- *  More about azk
- *  ---------------------------------
- *  + Site
- *      http://azk.io
- *
- *  + Github
- *      https://github.com/azukiapp/azk
- *
- *  + Documentation
- *      http://docs.azk.io
- *
- *  + Images directory created by the azk team
- *      http://images.azk.io
- *
- *  ---------------------------------
- *  Contribute to azk
- *  ---------------------------------
- *  + Star azk on Github
- *      https://github.com/azukiapp/azk
- *
- *  + Report an issue
- *      https://github.com/azukiapp/azk/issues/new
- *
- *  + Help solving a reported issue
- *      https://github.com/azukiapp/azk/issues
- *
- *  + Check out our awesome sponsors
- *      http://azk.io/#sponsors
- *
- *  ---------------------------------
- *  Stay in touch with the azk team
- *  ---------------------------------
- *  + Sign up the weekly digest
- *      http://www.azk.io/#newsletter
- *
- *  + Follow the blog
- *      https://medium.com/azuki-news
- *
- *  + Talk to our support (chat)
- *      https://gitter.im/azukiapp/azk (English) ehttps://gitter.im/azukiapp/azk/pt (Português)
- *
- *  + Facebook
- *      https://www.facebook.com/azukiapp
- *
- *  + Twitter
- *      http://twitter.com/azukiapp
- */

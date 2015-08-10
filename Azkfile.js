@@ -195,6 +195,7 @@ systems({
       AZK_RESTART_COMMAND: 'azk restart -Rvv',
       RUN_SETUP: 'false',
       RUN_CONFIGURE: 'false',
+      RUN_DEPLOY: 'true',
     }
   },
 

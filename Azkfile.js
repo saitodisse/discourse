@@ -175,6 +175,11 @@ systems({
     }
   },
 
+  /////////////////////////////////////////////////
+  /// deploy
+  /// -----------------------------
+  /// https://github.com/azukiapp/docker-deploy-digitalocean
+  /////////////////////////////////////////////////
   deploy: {
     image: {"docker": "azukiapp/deploy-digitalocean"},
     mounts: {
@@ -188,6 +193,11 @@ systems({
     }
   },
 
+  /////////////////////////////////////////////////
+  /// deploy
+  /// -----------------------------
+  /// https://github.com/azukiapp/docker-deploy-digitalocean
+  /////////////////////////////////////////////////
   "fast-deploy": {
     extends: 'deploy',
     envs: {

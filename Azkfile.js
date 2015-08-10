@@ -33,7 +33,10 @@ systems({
     },
     scalable: {"default": 1},
     http: {
-      domains: [ "#{system.name}.#{azk.default_domain}" ]
+      domains: [
+        "#{system.name}.#{azk.default_domain}", // default azk
+        "#{process.env.AZK_HOST_IP}"            // used if deployed
+      ]
     },
     ports: {
       // exports global variables
@@ -57,7 +60,7 @@ systems({
   /// discourse-sidekiq
   /// ----------------------
   /// sidekiq worker
-  /// /jobs
+  /// `/jobs` folder
   /////////////////////////////////////////////////
   "discourse-sidekiq": {
     depends: ["discourse", "postgres", "redis", "mail"], // depends on discourse too
@@ -72,7 +75,7 @@ systems({
   /////////////////////////////////////////////////
   /// postgres
   /// ----------------------
-  /// postgres:9.3
+  /// postgres:9.3 database
   /////////////////////////////////////////////////
   postgres: {
     depends: [],
@@ -101,7 +104,7 @@ systems({
   /////////////////////////////////////////////////
   /// redis
   /// ----------------------
-  /// database
+  /// redis database
   /////////////////////////////////////////////////
   redis: {
     image: {"docker": "redis"},
@@ -137,6 +140,7 @@ systems({
     },
     export_envs: {
       // exports global variables to discourse's systems
+      // see on Azkfile.md how to use real SMTP servers
       DISCOURSE_MAILCATCHER_SMTP_ADDRESS: "#{net.host}",
       DISCOURSE_MAILCATCHER_SMTP_PORT: "#{net.port.smtp}"
     }
@@ -179,10 +183,18 @@ systems({
     },
     scalable: {"default": 0, "limit": 0},
     envs: {
-      //RUN_DEPLOY: 'false',
-      //RUN_SETUP: 'false',
-      AZK_RESTART_COMMAND: 'azk restart -R',
-      AZK_CHECKOUT_COMMIT_BRANCH_TAG: 'feature/azkfile',
+      GIT_CHECKOUT_COMMIT_BRANCH_TAG: 'feature/azkfile',
+      AZK_RESTART_COMMAND: 'azk restart -Rvv',
+    }
+  },
+
+  "fast-deploy": {
+    extends: 'deploy',
+    envs: {
+      GIT_CHECKOUT_COMMIT_BRANCH_TAG: 'feature/azkfile',
+      AZK_RESTART_COMMAND: 'azk restart -Rvv',
+      RUN_SETUP: 'false',
+      RUN_CONFIGURE: 'false',
     }
   },
 

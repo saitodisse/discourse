@@ -22,7 +22,7 @@ systems({
     ],
     workdir: "/azk/#{manifest.dir}",
     shell: "/bin/bash",
-    command: "rm /azk/discourse/tmp/pids/server.pid; bundle exec rackup config.ru --pid /tmp/ruby.pid --port $HTTP_PORT --host 0.0.0.0",
+    command: "bundle exec rails server -p $HTTP_PORT -P /tmp/ruby.pid -b 0.0.0.0",
     wait: 20,
     mounts: {
       "/azk/#{manifest.dir}": sync("."),

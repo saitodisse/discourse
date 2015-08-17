@@ -18,7 +18,7 @@ azk start
 
 > Attention 1: if you are running for the first time the `azk start` command may take several minutes. This is because it will download all images and provision all systems.
 
-> Attention 2: this is a dev only version. To test production or several instances in cloud use this instructions: https://github.com/discourse/discourse/blob/master/docs/INSTALL-cloud.md
+> Attention 2: this is a **dev only** version. To test production or several instances in cloud use this instructions: https://github.com/discourse/discourse/blob/master/docs/INSTALL-cloud.md
 
 --------------------
 

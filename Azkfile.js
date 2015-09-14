@@ -35,7 +35,7 @@ systems({
     http: {
       domains: [
         "#{system.name}.#{azk.default_domain}", // default azk
-        "#{process.env.AZK_HOST_IP}"            // used if deployed
+        "#{env.AZK_HOST_IP}"                    // used if deployed
       ]
     },
     ports: {
@@ -184,7 +184,7 @@ systems({
     image: {"docker": "azukiapp/deploy-digitalocean"},
     mounts: {
       "/azk/deploy/src":  path("."),
-      "/azk/deploy/.ssh": path("#{process.env.HOME}/.ssh")
+      "/azk/deploy/.ssh": path("#{env.HOME}/.ssh")
     },
     scalable: {"default": 0, "limit": 0},
     envs: {
